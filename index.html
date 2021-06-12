@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Game</title>
+</head>
+<body>
+    <!-- Start Game -->
+    <section id="login">
+        <h1>Papa's 20,000 tracker</h1>
+        <button>Start Game</button>
+    </section>
+
+    <!-- Add users -->
+    <section id="addusers" hidden>
+        <h2>Add Players</h2>
+        <p>* You must add at least 1 player to start the game</p>
+        <input type="text" name="playername" id="playername" placeholder="Add Player Name">
+        <button id="addplayer">Add Player</button>
+        <button>Start Game</button>
+        <h4>Players added:</h4>
+        <ol id="listOfPlayers"></ol>
+    </section>
+
+    <!-- Basic Gameplay functionality -->
+    <section id="gameplay" hidden>
+        <h2 id="currentPlayer"></h2>
+        <input type="tel" id="roundScore"/>
+        <h3 id="totalScore"></h3>
+        <button id="addToScore">Add To Score</button>
+        <h4>Past Scores</h4>
+        <ol id="previousScores"></ol>
+    </section>
+
+    <script src="./main.js"></script>
+</body>
+</html>
