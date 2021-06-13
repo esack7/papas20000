@@ -1,0 +1,57 @@
+body {
+    background-color: #354854;
+    color: #FFFFFF;
+    font-size: 16px;
+}
+
+input[type='number'],
+input[type='tel'],
+input[type="text"],
+button {
+  font-size: inherit;
+}
+
+
+/* Login Page Styles */
+#login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100vw;
+}
+
+#login h1 {
+    color: #BE212E;
+    font-size: 2.0rem;
+}
+
+#login h2 {
+    font-size: 1.7rem;
+}
+
+#login button {
+    background-color: #979DA0;
+    color: #FFFFFF;
+}
+
+
+/* Add Players Page Styles */
+#addusers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100vw;
+}
+
+/* Game Play Styles */
+#gameplay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100vw;
+}
+
+
+[hidden] {
+    display: none !important;
+}

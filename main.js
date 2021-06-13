@@ -22,6 +22,7 @@ function startGame(e) {
                 addusersSection.hidden = false;
                 game = {
                     count: 0,
+                    currentPlayer: 0,
                     players: [],
                     playerMap: new Map()
                 };
@@ -30,7 +31,7 @@ function startGame(e) {
             else {
                 addusersSection.hidden = true;
                 gameplaySection.hidden = false;
-                currentPlayer = game.players[0];
+                currentPlayer = game.players[game.currentPlayer];
                 currentPlayerTitle.innerText = `${currentPlayer}'s turn`;
             }
         }
@@ -50,6 +51,8 @@ function handleAddPlayerClick() {
     });
 }
 ;
+function nextPlayersTurn() {
+}
 function handleAddToScoreClick() {
     const numberInput = parseInt(scoreInput.value);
     scoreInput.value = '';
