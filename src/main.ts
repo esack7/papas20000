@@ -24,6 +24,7 @@ class Player {
         }
 
         if(this.totalScore + points > 20000) {
+            this.scores.push(0);
             throw new Error('Over20000');
         }
 
@@ -122,10 +123,10 @@ function handleAddToScoreClick() {
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
         try {
-            game.getCurrentPlayer().addRoundPoints(numberInput); //Need to check if meet minimum or win
+            game.getCurrentPlayer().addRoundPoints(numberInput); //Need to check for win
         } catch (err) {
             error = true;
-            if(err === 'Over20000') {
+            if(err.message === 'Over20000') {
                 const lastPlayer = game.getCurrentPlayer().name;
                 gameWarning.innerText = `${lastPlayer}'s total score went over 20,000 so their last score was zero`;
             }
@@ -136,6 +137,7 @@ function handleAddToScoreClick() {
         const playersTotalScore = currentPlayer.getTotalScore();
         if(currentPlayer.getTotalScore() === 0) {
             error = true;
+            gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
         }
         if(!error) {
             gameWarning.style.display = 'none';
