@@ -23,13 +23,17 @@ class Player {
             return;
         }
 
-        if(this.totalScore + points > 20000) {
+        if(this.totalScore + points > Game.winningScore) {
             this.scores.push(0);
             throw new Error('Over20000');
         }
 
         this.scores.push(points);
         this.totalScore = this.scores.reduce((acc, curr) => acc + curr);
+
+        if(this.totalScore === Game.winningScore) {
+            handleWin(this);
+        }
     }
 
     getScoresArray(): string[] {
@@ -45,13 +49,14 @@ class Game {
     readonly id: string;
     readonly players: Player[];
     private currentPlayIndex: number;
-    readonly winningScore: number;
+    activeGame: boolean;
+    static winningScore: number = 20000;
 
     constructor() {
         this.id = 'game' + randomId();
         this.players = [];
         this.currentPlayIndex = 0;
-        this.winningScore = 20000
+        this.activeGame = true;
     }
 
     addPlayer(player: Player) {
@@ -74,6 +79,7 @@ class Game {
 const loginSection = <HTMLElement>document.getElementById('login');
 const addusersSection = <HTMLElement>document.getElementById('addusers');
 const gameplaySection = <HTMLElement>document.getElementById('gameplay');
+const gameOverSection = <HTMLElement>document.getElementById('gameOver');
 const totalScore = <HTMLHeadingElement>document.getElementById('totalScore');
 const scoreInput = <HTMLInputElement>document.getElementById('roundScore');
 const playerInput = <HTMLInputElement>document.getElementById('playername');
@@ -83,6 +89,9 @@ const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore'
 const prevScoresList = <HTMLOListElement>document.getElementById('previousScores');
 const currentPlayerTitle = <HTMLHeadingElement>document.getElementById('currentPlayer');
 const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
+const endTitle = <HTMLHeadingElement>document.getElementById('endTitle');
+const endScores = <HTMLHeadingElement>document.getElementById('endScores');
+const reloadPageButton = <HTMLHeadingElement>document.getElementById('reloadPage');
 
 let game: Game;
 
@@ -94,7 +103,7 @@ function startGame(e: Event) {
                 loginSection.hidden = true;
                 addusersSection.hidden = false;
                 game = new Game();
-            } else {
+            } else if(!addusersSection.hidden && game.players.length !== 0){
                 addusersSection.hidden = true;
                 gameplaySection.hidden = false;
                 currentPlayerTitle.innerText = `${game.getCurrentPlayer().name}'s turn`;
@@ -154,7 +163,30 @@ function handleAddToScoreClick() {
     }
 };
 
+function handleWin(winningPlayer: Player) {
+    console.log(`${winningPlayer.name} has won the game!!!`);
+    gameplaySection.hidden = true;
+    gameOverSection.hidden = false;
+    endTitle.innerText = `${winningPlayer.name} has won the game!!!`;
+    game.players.forEach(player => {
+        const playerRow = document.createElement('tr');
+        const playerNameTD = document.createElement('td');
+        playerNameTD.appendChild(document.createTextNode(player.name));
+        playerRow.appendChild(playerNameTD);
+        const playerScoreTD = document.createElement('td');
+        playerScoreTD.appendChild(document.createTextNode(player.getTotalScore().toLocaleString()));
+        playerRow.appendChild(playerScoreTD);
+        endScores.appendChild(playerRow);
+    });
+    game.activeGame = false;
+}
+
+function playAgain() {
+    window.location.reload();
+}
+
 loginSection.addEventListener('click', e => startGame(e));
 addusersSection.addEventListener('click', e => startGame(e));
 addToScoreButton.addEventListener('click', handleAddToScoreClick);
 addPlayerButton.addEventListener('click', handleAddPlayerClick);
+reloadPageButton.addEventListener('click', playAgain);
