@@ -137,31 +137,37 @@ function handleAddToScoreClick() {
     scoreInput.value = '';
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
+        const lastPlayer = game.getCurrentPlayer();
         try {
             game.getCurrentPlayer().addRoundPoints(numberInput);
         } catch (err) {
             error = true;
             if(err.message === 'Over20000') {
-                const lastPlayer = game.getCurrentPlayer().name;
-                gameWarning.innerText = `${lastPlayer}'s total score went over 20,000 so their last score was zero`;
+                gameWarning.innerText = `${lastPlayer.name}'s total score went over 20,000 so their last score was zero`;
             }
             if (err.message === 'Not multiple of 50') {
                 gameWarning.innerText = 'The score must be a multiple of 50.';
+                return;
             }
         }
         
         game.nextTurn();
         const currentPlayer = game.getCurrentPlayer();
         const playersTotalScore = currentPlayer.getTotalScore();
-        if(currentPlayer.getTotalScore() === 0) {
+        const lastPlayerScores = lastPlayer.getScoresArray();
+        if (playersTotalScore === 0) {
             error = true;
             gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
         }
-        if(!error) {
-            gameWarning.style.display = 'none';
-        } else {
-            gameWarning.style.display = 'inherit';
+        // if(!error) {
+        //     gameWarning.style.display = 'none';
+        // } else {
+        //     gameWarning.style.display = 'inherit';
+        // }
+        if (lastPlayerScores.length > 0 && playersTotalScore !== 0) {
+            gameWarning.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`
         }
+
         currentPlayerTitle.innerText = `${currentPlayer.name}'s turn`;
         totalScore.innerText = playersTotalScore.toString();
         currentPlayer.getScoresArray().forEach(score => {
