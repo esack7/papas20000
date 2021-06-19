@@ -117,7 +117,9 @@ function handleAddPlayerClick() {
     const playerNameInput = playerInput.value.trim();
     playerInput.value = '';
     playersList.innerHTML = '';
-    game.addPlayer(new Player(playerNameInput));
+    if(playerNameInput !== '') {
+        game.addPlayer(new Player(playerNameInput));
+    }
     game.players.forEach(element => {
         const playerListItem = document.createElement('li');
         playerListItem.appendChild(document.createTextNode(element.name));
