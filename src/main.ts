@@ -28,6 +28,10 @@ class Player {
             throw new Error('Over20000');
         }
 
+        if(points % 50 !== 0) {
+            throw new Error('Not multiple of 50');
+        }
+
         this.scores.push(points);
         this.totalScore = this.scores.reduce((acc, curr) => acc + curr);
 
@@ -134,12 +138,15 @@ function handleAddToScoreClick() {
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
         try {
-            game.getCurrentPlayer().addRoundPoints(numberInput); //Need to check for win
+            game.getCurrentPlayer().addRoundPoints(numberInput);
         } catch (err) {
             error = true;
             if(err.message === 'Over20000') {
                 const lastPlayer = game.getCurrentPlayer().name;
                 gameWarning.innerText = `${lastPlayer}'s total score went over 20,000 so their last score was zero`;
+            }
+            if (err.message === 'Not multiple of 50') {
+                gameWarning.innerText = 'The score must be a multiple of 50.';
             }
         }
         
