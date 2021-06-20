@@ -162,7 +162,11 @@ function handleAddToScoreClick() {
         game.nextTurn();
         const currentPlayer = game.getCurrentPlayer();
         if(game.lastRound && game.winnersBracket.includes(currentPlayer.name)) {
-            handleWin(currentPlayer);
+            if(game.winnersBracket.length === 1) {
+                handleWin(currentPlayer);
+            } else {
+                handleShowdown(game);
+            }
         } else {
             const playersTotalScore = currentPlayer.getTotalScore();
             const lastPlayerScores = lastPlayer.getScoresArray();
@@ -201,6 +205,28 @@ function handleWin(winningPlayer: Player) {
     gameplaySection.hidden = true;
     gameOverSection.hidden = false;
     endTitle.innerText = `${winningPlayer.name} has won the game!!!`;
+    game.players.forEach(player => {
+        const playerRow = document.createElement('tr');
+        const playerNameTD = document.createElement('td');
+        playerNameTD.appendChild(document.createTextNode(player.name));
+        playerRow.appendChild(playerNameTD);
+        const playerScoreTD = document.createElement('td');
+        playerScoreTD.appendChild(document.createTextNode(player.getTotalScore().toLocaleString()));
+        playerRow.appendChild(playerScoreTD);
+        endScores.appendChild(playerRow);
+    });
+    game.activeGame = false;
+}
+
+function handleShowdown(game: Game) {
+    console.log(`Game Showdown!!!`);
+    gameplaySection.hidden = true;
+    gameOverSection.hidden = false;
+    let listOfShowdownPlayers = '\n';
+    game.winnersBracket.forEach(player => listOfShowdownPlayers = listOfShowdownPlayers + player + '\n');
+    endTitle.innerText = `The following players tied at 20,000 points each!
+    ${listOfShowdownPlayers}
+    Time for a SHOWDOWN!!!`;
     game.players.forEach(player => {
         const playerRow = document.createElement('tr');
         const playerNameTD = document.createElement('td');
