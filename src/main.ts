@@ -100,6 +100,7 @@ const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore'
 const prevScoresList = <HTMLOListElement>document.getElementById('previousScores');
 const currentPlayerTitle = <HTMLHeadingElement>document.getElementById('currentPlayer');
 const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
+const previousScore = <HTMLHeadingElement>document.getElementById('previousScore');
 const endTitle = <HTMLHeadingElement>document.getElementById('endTitle');
 const endScores = <HTMLHeadingElement>document.getElementById('endScores');
 const reloadPageButton = <HTMLHeadingElement>document.getElementById('reloadPage');
@@ -140,7 +141,7 @@ function handleAddPlayerClick() {
 
 function handleAddToScoreClick() {
     const numberInput = parseInt(scoreInput.value);
-    // let error = false;
+    let error = false;
     scoreInput.value = '';
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
@@ -148,12 +149,13 @@ function handleAddToScoreClick() {
         try {
             game.getCurrentPlayer().addRoundPoints(numberInput);
         } catch (err) {
-            // error = true;
+            error = true;
             if(err.message === 'Over20000') {
                 gameWarning.innerText = `${lastPlayer.name}'s total score went over 20,000 so their last score was zero`;
             }
             if (err.message === 'Not multiple of 50') {
                 gameWarning.innerText = 'The score must be a multiple of 50.';
+                gameWarning.style.display = 'inherit';
                 return;
             }
         }
@@ -165,16 +167,17 @@ function handleAddToScoreClick() {
             const playersTotalScore = currentPlayer.getTotalScore();
             const lastPlayerScores = lastPlayer.getScoresArray();
             if (playersTotalScore === 0) {
-                // error = true;
+                error = true;
                 gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
             }
-            // if(!error) {
-            //     gameWarning.style.display = 'none';
-            // } else {
-            //     gameWarning.style.display = 'inherit';
-            // }
+            if(!error) {
+                gameWarning.style.display = 'none';
+            } else {
+                gameWarning.style.display = 'inherit';
+            }
             if (lastPlayerScores.length > 0 && playersTotalScore !== 0) {
-                gameWarning.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`
+                previousScore.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`;
+                previousScore.hidden = false;
             }
     
             currentPlayerTitle.innerText = `${currentPlayer.name}'s turn`;
