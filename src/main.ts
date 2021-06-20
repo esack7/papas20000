@@ -28,11 +28,15 @@ class Player {
             throw new Error('Over20000');
         }
 
+        if(points % 50 !== 0) {
+            throw new Error('Not multiple of 50');
+        }
+
         this.scores.push(points);
         this.totalScore = this.scores.reduce((acc, curr) => acc + curr);
 
         if(this.totalScore === Game.winningScore) {
-            handleWin(this);
+            playLastRound(this);
         }
     }
 
@@ -48,15 +52,19 @@ class Player {
 class Game {
     readonly id: string;
     readonly players: Player[];
+    readonly winnersBracket: string[];
     private currentPlayIndex: number;
     activeGame: boolean;
+    lastRound: boolean;
     static winningScore: number = 20000;
 
     constructor() {
         this.id = 'game' + randomId();
         this.players = [];
+        this.winnersBracket = [];
         this.currentPlayIndex = 0;
         this.activeGame = true;
+        this.lastRound = false;
     }
 
     addPlayer(player: Player) {
@@ -73,6 +81,9 @@ class Game {
         if(this.currentPlayIndex >= totalPlayers) {
             this.currentPlayIndex = 0;
         }
+    }
+    addToWinnersBracket(player: Player) {
+        this.winnersBracket.push(player.name);
     }
 }
 
@@ -117,7 +128,9 @@ function handleAddPlayerClick() {
     const playerNameInput = playerInput.value.trim();
     playerInput.value = '';
     playersList.innerHTML = '';
-    game.addPlayer(new Player(playerNameInput));
+    if(playerNameInput !== '') {
+        game.addPlayer(new Player(playerNameInput));
+    }
     game.players.forEach(element => {
         const playerListItem = document.createElement('li');
         playerListItem.appendChild(document.createTextNode(element.name));
@@ -127,41 +140,58 @@ function handleAddPlayerClick() {
 
 function handleAddToScoreClick() {
     const numberInput = parseInt(scoreInput.value);
-    let error = false;
+    // let error = false;
     scoreInput.value = '';
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
+        const lastPlayer = game.getCurrentPlayer();
         try {
-            game.getCurrentPlayer().addRoundPoints(numberInput); //Need to check for win
+            game.getCurrentPlayer().addRoundPoints(numberInput);
         } catch (err) {
-            error = true;
+            // error = true;
             if(err.message === 'Over20000') {
-                const lastPlayer = game.getCurrentPlayer().name;
-                gameWarning.innerText = `${lastPlayer}'s total score went over 20,000 so their last score was zero`;
+                gameWarning.innerText = `${lastPlayer.name}'s total score went over 20,000 so their last score was zero`;
+            }
+            if (err.message === 'Not multiple of 50') {
+                gameWarning.innerText = 'The score must be a multiple of 50.';
+                return;
             }
         }
-        
         game.nextTurn();
         const currentPlayer = game.getCurrentPlayer();
-        const playersTotalScore = currentPlayer.getTotalScore();
-        if(currentPlayer.getTotalScore() === 0) {
-            error = true;
-            gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
-        }
-        if(!error) {
-            gameWarning.style.display = 'none';
+        if(game.lastRound && game.winnersBracket.includes(currentPlayer.name)) {
+            handleWin(currentPlayer);
         } else {
-            gameWarning.style.display = 'inherit';
+            const playersTotalScore = currentPlayer.getTotalScore();
+            const lastPlayerScores = lastPlayer.getScoresArray();
+            if (playersTotalScore === 0) {
+                // error = true;
+                gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
+            }
+            // if(!error) {
+            //     gameWarning.style.display = 'none';
+            // } else {
+            //     gameWarning.style.display = 'inherit';
+            // }
+            if (lastPlayerScores.length > 0 && playersTotalScore !== 0) {
+                gameWarning.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`
+            }
+    
+            currentPlayerTitle.innerText = `${currentPlayer.name}'s turn`;
+            totalScore.innerText = playersTotalScore.toString();
+            currentPlayer.getScoresArray().forEach(score => {
+                const scoreListItem = document.createElement('li');
+                scoreListItem.appendChild(document.createTextNode(score));
+                prevScoresList.appendChild(scoreListItem);
+            });
         }
-        currentPlayerTitle.innerText = `${currentPlayer.name}'s turn`;
-        totalScore.innerText = playersTotalScore.toString();
-        currentPlayer.getScoresArray().forEach(score => {
-            const scoreListItem = document.createElement('li');
-            scoreListItem.appendChild(document.createTextNode(score));
-            prevScoresList.appendChild(scoreListItem);
-        });
     }
 };
+
+function playLastRound(playerWhoReachedTwentyThousand: Player) {
+    game.lastRound = true;
+    game.addToWinnersBracket(playerWhoReachedTwentyThousand);
+}
 
 function handleWin(winningPlayer: Player) {
     console.log(`${winningPlayer.name} has won the game!!!`);
