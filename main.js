@@ -76,6 +76,7 @@ const addToScoreButton = document.getElementById('addToScore');
 const prevScoresList = document.getElementById('previousScores');
 const currentPlayerTitle = document.getElementById('currentPlayer');
 const gameWarning = document.getElementById('gameWarning');
+const previousScore = document.getElementById('previousScore');
 const endTitle = document.getElementById('endTitle');
 const endScores = document.getElementById('endScores');
 const reloadPageButton = document.getElementById('reloadPage');
@@ -115,7 +116,7 @@ function handleAddPlayerClick() {
 ;
 function handleAddToScoreClick() {
     const numberInput = parseInt(scoreInput.value);
-    // let error = false;
+    let error = false;
     scoreInput.value = '';
     if (!isNaN(numberInput)) {
         prevScoresList.innerHTML = '';
@@ -124,34 +125,42 @@ function handleAddToScoreClick() {
             game.getCurrentPlayer().addRoundPoints(numberInput);
         }
         catch (err) {
-            // error = true;
+            error = true;
             if (err.message === 'Over20000') {
                 gameWarning.innerText = `${lastPlayer.name}'s total score went over 20,000 so their last score was zero`;
             }
             if (err.message === 'Not multiple of 50') {
                 gameWarning.innerText = 'The score must be a multiple of 50.';
+                gameWarning.style.display = 'inherit';
                 return;
             }
         }
         game.nextTurn();
         const currentPlayer = game.getCurrentPlayer();
         if (game.lastRound && game.winnersBracket.includes(currentPlayer.name)) {
-            handleWin(currentPlayer);
+            if (game.winnersBracket.length === 1) {
+                handleWin(currentPlayer);
+            }
+            else {
+                handleShowdown(game);
+            }
         }
         else {
             const playersTotalScore = currentPlayer.getTotalScore();
             const lastPlayerScores = lastPlayer.getScoresArray();
             if (playersTotalScore === 0) {
-                // error = true;
+                error = true;
                 gameWarning.innerText = `You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.`;
             }
-            // if(!error) {
-            //     gameWarning.style.display = 'none';
-            // } else {
-            //     gameWarning.style.display = 'inherit';
-            // }
+            if (!error) {
+                gameWarning.style.display = 'none';
+            }
+            else {
+                gameWarning.style.display = 'inherit';
+            }
             if (lastPlayerScores.length > 0 && playersTotalScore !== 0) {
-                gameWarning.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`;
+                previousScore.innerText = `${lastPlayer.name}'s score was ${lastPlayerScores[lastPlayerScores.length - 1]}`;
+                previousScore.hidden = false;
             }
             currentPlayerTitle.innerText = `${currentPlayer.name}'s turn`;
             totalScore.innerText = playersTotalScore.toString();
@@ -173,6 +182,27 @@ function handleWin(winningPlayer) {
     gameplaySection.hidden = true;
     gameOverSection.hidden = false;
     endTitle.innerText = `${winningPlayer.name} has won the game!!!`;
+    game.players.forEach(player => {
+        const playerRow = document.createElement('tr');
+        const playerNameTD = document.createElement('td');
+        playerNameTD.appendChild(document.createTextNode(player.name));
+        playerRow.appendChild(playerNameTD);
+        const playerScoreTD = document.createElement('td');
+        playerScoreTD.appendChild(document.createTextNode(player.getTotalScore().toLocaleString()));
+        playerRow.appendChild(playerScoreTD);
+        endScores.appendChild(playerRow);
+    });
+    game.activeGame = false;
+}
+function handleShowdown(game) {
+    console.log(`Game Showdown!!!`);
+    gameplaySection.hidden = true;
+    gameOverSection.hidden = false;
+    let listOfShowdownPlayers = '\n';
+    game.winnersBracket.forEach(player => listOfShowdownPlayers = listOfShowdownPlayers + player + '\n');
+    endTitle.innerText = `The following players tied at 20,000 points each!
+    ${listOfShowdownPlayers}
+    Time for a SHOWDOWN!!!`;
     game.players.forEach(player => {
         const playerRow = document.createElement('tr');
         const playerNameTD = document.createElement('td');
