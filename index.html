@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <title>Dice Game</title>
 </head>
+
 <body>
     <!-- Start Game -->
     <section id="login">
@@ -28,9 +30,11 @@
 
     <!-- Basic Gameplay functionality -->
     <section id="gameplay" hidden>
-        <p id="gameWarning">You must score at least 1000 points to get on the board, otherwise your score is 0 for this round.</p>
+        <p id="gameWarning">You must score at least 1000 points to get on the board, otherwise your score is 0 for this
+            round.</p>
+        <p id="previousScore" hidden></p>
         <h2 id="currentPlayer"></h2>
-        <input type="tel" id="roundScore"/>
+        <input type="tel" id="roundScore" />
         <h3 id="totalScore"></h3>
         <button id="addToScore">Add To Score</button>
         <h4>Past Scores</h4>
@@ -51,4 +55,5 @@
 
     <script src="./main.js"></script>
 </body>
+
 </html>
