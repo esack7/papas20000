@@ -282,9 +282,9 @@ function playAgain() {
 
 function loadGame(gameState: GameInterface) {
     game = new Game(gameState.id, gameState.players, gameState.winnersBracket, gameState.currentPlayIndex, gameState.activeGame, gameState.lastRound, gameState.gameWarningText, gameState.errorState);
+    loginSection.hidden = true;
     addusersSection.hidden = true;
     gameplaySection.hidden = false;
-    loginSection.hidden = true;
     handlePostScoreDisplay();
 }
 
