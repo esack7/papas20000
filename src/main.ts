@@ -115,12 +115,15 @@ const loginSection = <HTMLElement>document.getElementById('login');
 const addusersSection = <HTMLElement>document.getElementById('addusers');
 const gameplaySection = <HTMLElement>document.getElementById('gameplay');
 const gameOverSection = <HTMLElement>document.getElementById('gameOver');
+const menuSection = <HTMLElement>document.getElementById('menu');
 const totalScore = <HTMLHeadingElement>document.getElementById('totalScore');
 const scoreInput = <HTMLInputElement>document.getElementById('roundScore');
 const playerInput = <HTMLInputElement>document.getElementById('playername');
 const playersList = <HTMLOListElement>document.getElementById('listOfPlayers');
 const addPlayerButton = <HTMLButtonElement>document.getElementById('addplayer');
 const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore');
+const showMenuButton = <HTMLButtonElement>document.getElementById('showMenu');
+const closeMenuButton = <HTMLButtonElement>document.getElementById('closeMenu');
 const prevScoresList = <HTMLOListElement>document.getElementById('previousScores');
 const currentPlayerTitle = <HTMLHeadingElement>document.getElementById('currentPlayer');
 const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
@@ -288,6 +291,16 @@ function loadGame(gameState: GameInterface) {
     handlePostScoreDisplay();
 }
 
+function handleShowMenuClick() {
+    gameplaySection.hidden = true;
+    menuSection.hidden = false;
+}
+
+function handleCloseMenuClick() {
+    menuSection.hidden = true;
+    gameplaySection.hidden = false;
+}
+
 window.onload = () => {
     if (localStorage.recentGame) {
         const gameState = <GameInterface>JSON.parse(localStorage.recentGame);
@@ -302,3 +315,5 @@ addusersSection.addEventListener('click', e => startGame(e));
 addToScoreButton.addEventListener('click', handleAddToScoreClick);
 addPlayerButton.addEventListener('click', handleAddPlayerClick);
 reloadPageButton.addEventListener('click', playAgain);
+showMenuButton.addEventListener('click', handleShowMenuClick);
+closeMenuButton.addEventListener('click', handleCloseMenuClick);
