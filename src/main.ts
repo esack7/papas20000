@@ -57,6 +57,7 @@ interface GameInterface {
     lastRound: boolean;
     gameWarningText: string;
     errorState: boolean;
+    previousState: string;
 }
 
 class Game implements GameInterface {
@@ -68,9 +69,10 @@ class Game implements GameInterface {
     lastRound: boolean;
     gameWarningText: string;
     errorState: boolean;
+    previousState: string;
     static winningScore: number = 20000;
 
-    constructor(id = `game${randomId()}`, players: Player[] = [], winnersBracket: string[] = [], currentPlayIndex = 0, activeGame = true, lastRound = false, gameWarningText = '', errorState = false) {
+    constructor(id = `game${randomId()}`, players: Player[] = [], winnersBracket: string[] = [], currentPlayIndex = 0, activeGame = true, lastRound = false, gameWarningText = '', errorState = false, previousState = '') {
         this.id = id
         this.winnersBracket = winnersBracket;
         this.currentPlayIndex = currentPlayIndex;
@@ -78,6 +80,7 @@ class Game implements GameInterface {
         this.lastRound = lastRound;
         this.gameWarningText = gameWarningText;
         this.errorState = errorState;
+        this.previousState = previousState;
         if (players.length === 0) {
             this.players = players;
         } else {
@@ -125,6 +128,8 @@ const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore'
 const showMenuButton = <HTMLButtonElement>document.getElementById('showMenu');
 const closeMenuButton = <HTMLButtonElement>document.getElementById('closeMenu');
 const cancelGameButton = <HTMLButtonElement>document.getElementById('cancelGame');
+const showLeaderboardButton = <HTMLButtonElement>document.getElementById('showLeaderboard');
+const undoButton = <HTMLButtonElement>document.getElementById('undoLastMove');
 const prevScoresList = <HTMLOListElement>document.getElementById('previousScores');
 const currentPlayerTitle = <HTMLHeadingElement>document.getElementById('currentPlayer');
 const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
@@ -168,6 +173,8 @@ function handleAddPlayerClick() {
 };
 
 function handleAddToScoreClick() {
+    game.previousState = '';
+    game.previousState = JSON.stringify(game);
     const numberInput = parseInt(scoreInput.value);
     game.errorState = false;
     scoreInput.value = '';
@@ -293,6 +300,11 @@ function loadGame(gameState: GameInterface) {
 }
 
 function handleShowMenuClick() {
+    if(game.previousState === '') {
+        undoButton.hidden = true;
+    } else {
+        undoButton.hidden = false;
+    }
     gameplaySection.hidden = true;
     menuSection.hidden = false;
 }
@@ -306,6 +318,15 @@ function handleCancelGame() {
     game.activeGame = false;
     localStorage.setItem('recentGame', JSON.stringify(game));
     window.location.reload();
+}
+
+function handleUndoLastScore() {
+    localStorage.setItem('recentGame', game.previousState);
+    window.location.reload();
+}
+
+function handleShowLeaderboard() {
+    console.log('Leaderboard!!!');
 }
 
 window.onload = () => {
@@ -325,3 +346,5 @@ reloadPageButton.addEventListener('click', playAgain);
 showMenuButton.addEventListener('click', handleShowMenuClick);
 closeMenuButton.addEventListener('click', handleCloseMenuClick);
 cancelGameButton.addEventListener('click', handleCancelGame);
+undoButton.addEventListener('click', handleUndoLastScore);
+showLeaderboardButton.addEventListener('click', handleShowLeaderboard);
