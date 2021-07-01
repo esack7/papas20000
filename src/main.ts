@@ -124,6 +124,7 @@ const addPlayerButton = <HTMLButtonElement>document.getElementById('addplayer');
 const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore');
 const showMenuButton = <HTMLButtonElement>document.getElementById('showMenu');
 const closeMenuButton = <HTMLButtonElement>document.getElementById('closeMenu');
+const cancelGameButton = <HTMLButtonElement>document.getElementById('cancelGame');
 const prevScoresList = <HTMLOListElement>document.getElementById('previousScores');
 const currentPlayerTitle = <HTMLHeadingElement>document.getElementById('currentPlayer');
 const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
@@ -301,6 +302,12 @@ function handleCloseMenuClick() {
     gameplaySection.hidden = false;
 }
 
+function handleCancelGame() {
+    game.activeGame = false;
+    localStorage.setItem('recentGame', JSON.stringify(game));
+    window.location.reload();
+}
+
 window.onload = () => {
     if (localStorage.recentGame) {
         const gameState = <GameInterface>JSON.parse(localStorage.recentGame);
@@ -317,3 +324,4 @@ addPlayerButton.addEventListener('click', handleAddPlayerClick);
 reloadPageButton.addEventListener('click', playAgain);
 showMenuButton.addEventListener('click', handleShowMenuClick);
 closeMenuButton.addEventListener('click', handleCloseMenuClick);
+cancelGameButton.addEventListener('click', handleCancelGame);
