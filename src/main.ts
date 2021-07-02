@@ -3,6 +3,12 @@ function randomId(): string {
     return uint32.toString(16);
 }
 
+function removeAllChildNodes(parent: HTMLElement) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
 class Player {
     readonly id: string;
     readonly name: string;
@@ -119,6 +125,7 @@ const addusersSection = <HTMLElement>document.getElementById('addusers');
 const gameplaySection = <HTMLElement>document.getElementById('gameplay');
 const gameOverSection = <HTMLElement>document.getElementById('gameOver');
 const menuSection = <HTMLElement>document.getElementById('menu');
+const leaderboardSection = <HTMLElement>document.getElementById('leaderboard');
 const totalScore = <HTMLHeadingElement>document.getElementById('totalScore');
 const scoreInput = <HTMLInputElement>document.getElementById('roundScore');
 const playerInput = <HTMLInputElement>document.getElementById('playername');
@@ -127,6 +134,7 @@ const addPlayerButton = <HTMLButtonElement>document.getElementById('addplayer');
 const addToScoreButton = <HTMLButtonElement>document.getElementById('addToScore');
 const showMenuButton = <HTMLButtonElement>document.getElementById('showMenu');
 const closeMenuButton = <HTMLButtonElement>document.getElementById('closeMenu');
+const closeLeaderboard = <HTMLButtonElement>document.getElementById('closeLeaderboard');
 const cancelGameButton = <HTMLButtonElement>document.getElementById('cancelGame');
 const showLeaderboardButton = <HTMLButtonElement>document.getElementById('showLeaderboard');
 const undoButton = <HTMLButtonElement>document.getElementById('undoLastMove');
@@ -136,6 +144,7 @@ const gameWarning = <HTMLHeadingElement>document.getElementById('gameWarning');
 const previousScore = <HTMLHeadingElement>document.getElementById('previousScore');
 const endTitle = <HTMLHeadingElement>document.getElementById('endTitle');
 const endScores = <HTMLHeadingElement>document.getElementById('endScores');
+const leaderboardScores = <HTMLHeadingElement>document.getElementById('leaderboardScores');
 const reloadPageButton = <HTMLHeadingElement>document.getElementById('reloadPage');
 
 let game: Game;
@@ -326,7 +335,24 @@ function handleUndoLastScore() {
 }
 
 function handleShowLeaderboard() {
-    console.log('Leaderboard!!!');
+    menuSection.hidden = true;
+    leaderboardSection.hidden = false;
+    removeAllChildNodes(leaderboardScores);
+    game.players.sort((a, b) => b.getTotalScore() - a.getTotalScore()).forEach(player => {
+        const playerRow = document.createElement('tr');
+        const playerNameTD = document.createElement('td');
+        playerNameTD.appendChild(document.createTextNode(player.name));
+        playerRow.appendChild(playerNameTD);
+        const playerScoreTD = document.createElement('td');
+        playerScoreTD.appendChild(document.createTextNode(player.getTotalScore().toLocaleString()));
+        playerRow.appendChild(playerScoreTD);
+        leaderboardScores.appendChild(playerRow);
+    });
+}
+
+function handleCloseLeaderboard() {
+    leaderboardSection.hidden = true;
+    gameplaySection.hidden = false;
 }
 
 window.onload = () => {
@@ -348,3 +374,4 @@ closeMenuButton.addEventListener('click', handleCloseMenuClick);
 cancelGameButton.addEventListener('click', handleCancelGame);
 undoButton.addEventListener('click', handleUndoLastScore);
 showLeaderboardButton.addEventListener('click', handleShowLeaderboard);
+closeLeaderboard.addEventListener('click', handleCloseLeaderboard);
