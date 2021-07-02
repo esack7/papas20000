@@ -3,6 +3,11 @@ function randomId() {
     const uint32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
     return uint32.toString(16);
 }
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
 class Player {
     constructor(name, id = 'player' + randomId(), scores = [], totalScore = 0) {
         this.id = id;
@@ -36,7 +41,7 @@ class Player {
     }
 }
 class Game {
-    constructor(id = `game${randomId()}`, players = [], winnersBracket = [], currentPlayIndex = 0, activeGame = true, lastRound = false, gameWarningText = '', errorState = false) {
+    constructor(id = `game${randomId()}`, players = [], winnersBracket = [], currentPlayIndex = 0, activeGame = true, lastRound = false, gameWarningText = '', errorState = false, previousState = '') {
         this.id = id;
         this.winnersBracket = winnersBracket;
         this.currentPlayIndex = currentPlayIndex;
@@ -44,6 +49,7 @@ class Game {
         this.lastRound = lastRound;
         this.gameWarningText = gameWarningText;
         this.errorState = errorState;
+        this.previousState = previousState;
         if (players.length === 0) {
             this.players = players;
         }
@@ -80,18 +86,27 @@ const loginSection = document.getElementById('login');
 const addusersSection = document.getElementById('addusers');
 const gameplaySection = document.getElementById('gameplay');
 const gameOverSection = document.getElementById('gameOver');
+const menuSection = document.getElementById('menu');
+const leaderboardSection = document.getElementById('leaderboard');
 const totalScore = document.getElementById('totalScore');
 const scoreInput = document.getElementById('roundScore');
 const playerInput = document.getElementById('playername');
 const playersList = document.getElementById('listOfPlayers');
 const addPlayerButton = document.getElementById('addplayer');
 const addToScoreButton = document.getElementById('addToScore');
+const showMenuButton = document.getElementById('showMenu');
+const closeMenuButton = document.getElementById('closeMenu');
+const closeLeaderboard = document.getElementById('closeLeaderboard');
+const cancelGameButton = document.getElementById('cancelGame');
+const showLeaderboardButton = document.getElementById('showLeaderboard');
+const undoButton = document.getElementById('undoLastMove');
 const prevScoresList = document.getElementById('previousScores');
 const currentPlayerTitle = document.getElementById('currentPlayer');
 const gameWarning = document.getElementById('gameWarning');
 const previousScore = document.getElementById('previousScore');
 const endTitle = document.getElementById('endTitle');
 const endScores = document.getElementById('endScores');
+const leaderboardScores = document.getElementById('leaderboardScores');
 const reloadPageButton = document.getElementById('reloadPage');
 let game;
 function startGame(e) {
@@ -128,6 +143,8 @@ function handleAddPlayerClick() {
 }
 ;
 function handleAddToScoreClick() {
+    game.previousState = '';
+    game.previousState = JSON.stringify(game);
     const numberInput = parseInt(scoreInput.value);
     game.errorState = false;
     scoreInput.value = '';
@@ -249,6 +266,48 @@ function loadGame(gameState) {
     gameplaySection.hidden = false;
     handlePostScoreDisplay();
 }
+function handleShowMenuClick() {
+    if (game.previousState === '') {
+        undoButton.hidden = true;
+    }
+    else {
+        undoButton.hidden = false;
+    }
+    gameplaySection.hidden = true;
+    menuSection.hidden = false;
+}
+function handleCloseMenuClick() {
+    menuSection.hidden = true;
+    gameplaySection.hidden = false;
+}
+function handleCancelGame() {
+    game.activeGame = false;
+    localStorage.setItem('recentGame', JSON.stringify(game));
+    window.location.reload();
+}
+function handleUndoLastScore() {
+    localStorage.setItem('recentGame', game.previousState);
+    window.location.reload();
+}
+function handleShowLeaderboard() {
+    menuSection.hidden = true;
+    leaderboardSection.hidden = false;
+    removeAllChildNodes(leaderboardScores);
+    game.players.sort((a, b) => b.getTotalScore() - a.getTotalScore()).forEach(player => {
+        const playerRow = document.createElement('tr');
+        const playerNameTD = document.createElement('td');
+        playerNameTD.appendChild(document.createTextNode(player.name));
+        playerRow.appendChild(playerNameTD);
+        const playerScoreTD = document.createElement('td');
+        playerScoreTD.appendChild(document.createTextNode(player.getTotalScore().toLocaleString()));
+        playerRow.appendChild(playerScoreTD);
+        leaderboardScores.appendChild(playerRow);
+    });
+}
+function handleCloseLeaderboard() {
+    leaderboardSection.hidden = true;
+    gameplaySection.hidden = false;
+}
 window.onload = () => {
     if (localStorage.recentGame) {
         const gameState = JSON.parse(localStorage.recentGame);
@@ -262,3 +321,9 @@ addusersSection.addEventListener('click', e => startGame(e));
 addToScoreButton.addEventListener('click', handleAddToScoreClick);
 addPlayerButton.addEventListener('click', handleAddPlayerClick);
 reloadPageButton.addEventListener('click', playAgain);
+showMenuButton.addEventListener('click', handleShowMenuClick);
+closeMenuButton.addEventListener('click', handleCloseMenuClick);
+cancelGameButton.addEventListener('click', handleCancelGame);
+undoButton.addEventListener('click', handleUndoLastScore);
+showLeaderboardButton.addEventListener('click', handleShowLeaderboard);
+closeLeaderboard.addEventListener('click', handleCloseLeaderboard);

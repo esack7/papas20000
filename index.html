@@ -30,6 +30,7 @@
 
     <!-- Basic Gameplay functionality -->
     <section id="gameplay" hidden>
+        <button id="showMenu">&#x2630</button>
         <p id="gameWarning" hidden></p>
         <p id="previousScore" hidden></p>
         <h2 id="currentPlayer"></h2>
@@ -38,6 +39,23 @@
         <button id="addToScore">Add To Score</button>
         <h4>Past Scores</h4>
         <ol id="previousScores"></ol>
+    </section>
+
+    <section id="menu" hidden>
+        <button id="closeMenu">&#x274c</button>
+        <button id="showLeaderboard">Leaderboard</button>
+        <button id="undoLastMove">Undo Last Score</button>
+        <button id="cancelGame">Cancel Game</button>
+    </section>
+
+    <section id="leaderboard" hidden>
+        <button id="closeLeaderboard">&#x274c</button>
+        <h3>Leaderboard Scores:</h3>
+        <table>
+            <tbody id="leaderboardScores">
+
+            </tbody>
+        </table>
     </section>
 
     <!-- Game Over -->
