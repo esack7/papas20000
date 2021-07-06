@@ -338,7 +338,9 @@ function handleShowLeaderboard() {
     menuSection.hidden = true;
     leaderboardSection.hidden = false;
     removeAllChildNodes(leaderboardScores);
-    game.players.sort((a, b) => b.getTotalScore() - a.getTotalScore()).forEach(player => {
+    const sortingArray: Player[] = [];
+    game.players.forEach(player => sortingArray.push(player));
+    sortingArray.sort((a, b) => b.getTotalScore() - a.getTotalScore()).forEach(player => {
         const playerRow = document.createElement('tr');
         const playerNameTD = document.createElement('td');
         playerNameTD.appendChild(document.createTextNode(player.name));
